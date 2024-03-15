@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.LocalStorage
 import "Database.js" as JS
 
+//Main.qml
 Window {
     id: window
 
@@ -31,7 +32,9 @@ Window {
             anchors.margins: 10
 
             RowLayout {
-                Layout.alignment: Qt.AlignHCenter
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                //anchors.horizontalCenterOffset: +350
                 Button {
                     text: qsTr("New")
                     onClicked: {
@@ -65,6 +68,7 @@ Window {
                                 listView.model.get(listView.currentIndex).author,
                                 listView.model.get(listView.currentIndex).genre,
                                 listView.model.get(listView.currentIndex).rating,
+                                listView.model.get(listView.currentIndex).comment, // Include comment
                                 listView.model.get(listView.currentIndex).id
                             )
                         }
@@ -91,6 +95,7 @@ Window {
                             listView.model.get(listView.currentIndex).author,
                             listView.model.get(listView.currentIndex).genre,
                             listView.model.get(listView.currentIndex).rating,
+                            listView.model.get(listView.currentIndex).comment, // Include comment
                             listView.model.get(listView.currentIndex).id
                         )
 
@@ -179,7 +184,7 @@ Window {
                     RowLayout {
                         width: ListView.view.width
                         Repeater {
-                            model: [qsTr("Book Title"), qsTr("Author"), qsTr("Genre"), qsTr("Rating")]
+                            model: [qsTr("Book Title"), qsTr("Author"), qsTr("Genre"), qsTr("Rating"), qsTr("Comment")] // Include comment header
                             delegate: Label {
                                 id: headerTitleDelegate
 
