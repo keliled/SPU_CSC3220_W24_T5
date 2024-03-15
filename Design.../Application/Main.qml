@@ -1,40 +1,44 @@
+// Main.qml
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.LocalStorage
 import "Database.js" as JS
 
-//Main.qml
+// Define the main window
 Window {
     id: window
 
+    // Define properties to manage the state of new entry creation and editing
     property bool creatingNewEntry: false
     property bool editingEntry: false
 
+    // Set window properties
     visible: true
     width: Screen.width / 2
     height: Screen.height / 1.8
     color: "#161616"
 
-
+    // Define the main layout
     Rectangle {
         anchors.fill: parent
-
         ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 10
 
+            // Title label
             Label {
                 Layout.alignment: Qt.AlignCenter
                 text: qsTr("MyBookList")
                 font.pointSize: 30
             }
 
-            anchors.fill: parent
-            anchors.margins: 10
-
+            // Buttons row layout
             RowLayout {
-
                 anchors.horizontalCenter: parent.horizontalCenter
-                //anchors.horizontalCenterOffset: +350
+
+                // New button
                 Button {
                     text: qsTr("New")
                     onClicked: {
@@ -43,7 +47,8 @@ Window {
                         listView.model.setProperty(listView.currentIndex, "id", 0)
                     }
                 }
-                // Inside the "Save" button's onClicked handler
+
+                // Save button
                 Button {
                     id: saveButton
                     enabled: (window.creatingNewEntry || window.editingEntry) && listView.currentIndex !== -1
@@ -85,6 +90,7 @@ Window {
                     }
                 }
 
+                // Edit button
                 Button {
                     id: editButton
                     text: qsTr("Edit")
@@ -102,6 +108,8 @@ Window {
                         window.editingEntry = true
                     }
                 }
+
+                // Delete button
                 Button {
                     id: deleteButton
                     text: qsTr("Delete")
@@ -116,6 +124,8 @@ Window {
                         }
                     }
                 }
+
+                // Cancel button
                 Button {
                     id: cancelButton
                     text: qsTr("Cancel")
@@ -132,29 +142,36 @@ Window {
                         input.initrec()
                     }
                 }
+
+                // Exit button
                 Button {
                     text: qsTr("Exit")
                     onClicked: Qt.quit()
                 }
             }
 
+            // Header component
             Header {
-
                 id: input
                 Layout.fillWidth: true
                 listView: listView
                 enabled: window.creatingNewEntry || window.editingEntry
             }
+
+            // Spacing item
             Item {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 5
             }
+
+            // Label for saved books
             Label {
                 Layout.alignment: Qt.AlignCenter
                 text: qsTr("Saved Books")
                 font.pointSize: 15
             }
 
+            // Highlight bar component
             Component {
                 id: highlightBar
                 Rectangle {
@@ -163,6 +180,8 @@ Window {
                     color: "#00ffa1"
                 }
             }
+
+            // ListView to display saved books
             ListView {
                 id: listView
                 Layout.fillWidth: true
@@ -180,6 +199,7 @@ Window {
                 focus: true
                 clip: true
 
+                // Header for the ListView
                 header: Component {
                     RowLayout {
                         width: ListView.view.width
@@ -187,9 +207,7 @@ Window {
                             model: [qsTr("Book Title"), qsTr("Author"), qsTr("Genre"), qsTr("Rating"), qsTr("Comment")] // Include comment header
                             delegate: Label {
                                 id: headerTitleDelegate
-
                                 required property string modelData
-
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 Layout.preferredWidth: 1
@@ -206,6 +224,8 @@ Window {
                     }
                 }
             }
+
+            // Status text label
             Label {
                 id: statustext
                 color: "red"
@@ -215,30 +235,30 @@ Window {
                 visible: opacity > 0
                 Layout.alignment: Layout.Center
 
+                // Function to display a warning message
                 function displayWarning(text) {
                     statustext.text = text
                     statusAnim.restart()
                 }
 
+                // Connections for status messages
                 Connections {
                     target: input
                     function onStatusMessage(msg) { statustext.displayWarning(msg); }
                 }
 
+                // Animation for status message
                 SequentialAnimation {
                     id: statusAnim
-
                     OpacityAnimator {
                         target: statustext
                         from: 0.0
                         to: 1.0
                         duration: 50
                     }
-
                     PauseAnimation {
                         duration: 2000
                     }
-
                     OpacityAnimator {
                         target: statustext
                         from: 1.0
@@ -250,6 +270,7 @@ Window {
         }
     }
 
+    // Initialize the database and read saved data on component completion
     Component.onCompleted: {
         JS.dbInit()
         JS.dbReadAll(listView.model)
