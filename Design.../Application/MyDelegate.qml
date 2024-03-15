@@ -12,6 +12,7 @@ Item {
     required property string author
     required property string genre
     required property string rating
+    required property string comment
 
     signal clicked()
 
@@ -70,6 +71,15 @@ Item {
                 Layout.alignment: Qt.AlignCenter
                 horizontalAlignment: Text.AlignHCenter
                 text: delegate.rating
+                font.pixelSize: 22
+                color: "black"
+            }
+
+            Label {
+                Layout.preferredWidth: 42
+                Layout.alignment: Qt.AlignCenter
+                horizontalAlignment: Text.AlignHCenter
+                text: delegate.comment
                 font.pixelSize: 22
                 color: "black"
             }
