@@ -1,11 +1,9 @@
-// Database.js
-
 function dbInit() {
     let db = LocalStorage.openDatabaseSync("Book_Tracker_DB", "", "Track books", 1000000)
     try {
         db.transaction(function (tx) {
             // Create a new table if it doesn't exist
-            tx.executeSql('CREATE TABLE IF NOT EXISTS book_log (bookTitle TEXT, author TEXT, genre TEXT, rating TEXT)')
+            tx.executeSql('CREATE TABLE IF NOT EXISTS book_log (bookTitle TEXT, author TEXT, genre TEXT, rating TEXT, comment TEXT)')
         })
     } catch (err) {
         console.log("Error creating table in the database: " + err)
@@ -22,12 +20,12 @@ function dbGetHandle() {
     return db
 }
 
-function dbInsert(PbookTitle, Pauthor, Pgenre, Prating) {
+function dbInsert(PbookTitle, Pauthor, Pgenre, Prating, Pcomment) {
     let db = dbGetHandle()
     let rowid = 0;
     db.transaction(function (tx) {
-        tx.executeSql('INSERT INTO book_log (bookTitle, author, genre, rating) VALUES (?, ?, ?, ?)',
-                      [PbookTitle, Pauthor, Pgenre, Prating])
+        tx.executeSql('INSERT INTO book_log (bookTitle, author, genre, rating, comment) VALUES (?, ?, ?, ?, ?)',
+                      [PbookTitle, Pauthor, Pgenre, Prating, Pcomment])
         let result = tx.executeSql('SELECT last_insert_rowid()')
         rowid = result.insertId
     })
@@ -38,7 +36,7 @@ function dbReadAll(listModel) {
     let db = dbGetHandle()
     db.transaction(function (tx) {
         let results = tx.executeSql(
-            'SELECT rowid,bookTitle,author,genre,rating FROM book_log ORDER BY rowid DESC')
+            'SELECT rowid,bookTitle,author,genre,rating,comment FROM book_log ORDER BY rowid DESC')
         for (let i = 0; i < results.rows.length; i++) {
             listModel.append({
                 id: results.rows.item(i).rowid,
@@ -46,17 +44,18 @@ function dbReadAll(listModel) {
                 bookTitle: results.rows.item(i).bookTitle,
                 author: results.rows.item(i).author,
                 genre: results.rows.item(i).genre,
-                rating: results.rows.item(i).rating
+                rating: results.rows.item(i).rating,
+                comment: results.rows.item(i).comment // Include comment
             })
         }
     })
 }
 
-function dbUpdate(PbookTitle, Pauthor, Pgenre, Prating, Prowid) {
+function dbUpdate(PbookTitle, Pauthor, Pgenre, Prating, Pcomment, Prowid) {
     let db = dbGetHandle()
     db.transaction(function (tx) {
         tx.executeSql(
-            'UPDATE book_log SET bookTitle=?, author=?, genre=?, rating=? WHERE rowid = ?', [PbookTitle, Pauthor, Pgenre, Prating, Prowid])
+            'UPDATE book_log SET bookTitle=?, author=?, genre=?, rating=?, comment=? WHERE rowid = ?', [PbookTitle, Pauthor, Pgenre, Prating, Pcomment, Prowid])
     })
 }
 
@@ -81,7 +80,8 @@ function dbSaveModel(model) {
             model.get(i).bookTitle,
             model.get(i).author,
             model.get(i).genre,
-            model.get(i).rating
+            model.get(i).rating,
+            model.get(i).comment // Include comment
         )
     }
 }
